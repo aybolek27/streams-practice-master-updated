@@ -360,8 +360,10 @@ public class Practice {
 
     // Display all the job histories in descending order by start date
     public static List<JobHistory> getAllJobHistoriesInDescendingOrder() {
-        //TODO Implement the method
-        return new ArrayList<>();
+        return jobHistoryService.readAll().stream()
+                .sorted(comparing(JobHistory::getStartDate).reversed())
+                .collect(Collectors.toList());
+//        return new ArrayList<>();
     }
 
     // Display all the job histories where the start date is after 01.01.2005
@@ -386,7 +388,14 @@ public class Practice {
     public static Employee getEmployeeOfJobHistoryWhoseStartDateIsFirstDayOfJanuary2007AndEndDateIsLastDayOfDecember2007AndDepartmentNameIsShipping() throws Exception {
         LocalDate endDate= LocalDate.parse("2007-12-31");
         LocalDate startDate= LocalDate.parse("2007-01-01");
-        return new Employee();
+        Optional<Employee> expectedEmployee= jobHistoryService.readAll().stream()
+                .filter(e->e.getStartDate().isEqual(startDate)&&e.getEndDate().isEqual(endDate))
+                .filter(e-> e.getDepartment().getDepartmentName().equals("Shipping"))
+                .map(JobHistory::getEmployee)
+                .findAny();
+        return expectedEmployee.get();
+        
+//        return new Employee();
     }
 
     // Display all the employees whose first name starts with 'A'
@@ -408,7 +417,7 @@ public class Practice {
     // Display the number of employees whose job title is programmer and department name is 'IT'
     public static Long getNumberOfEmployeesWhoseJobTitleIsProgrammerAndDepartmentNameIsIT() {
         Long sum = employeeService.readAll().stream()
-                .filter(employee -> employee.getDepartment().equals("IT"))
+                .filter(employee -> employee.getDepartment().getDepartmentName().equals("IT"))
                 .filter(employee -> employee.getJob().getJobTitle().equals("Programmer"))
                 .count();
         return sum;
@@ -426,8 +435,10 @@ public class Practice {
     // Display the initials of all the employees
     // Note: You can assume that there is no middle name
     public static List<String> getAllEmployeesInitials() {
-        //TODO Implement the method
-        return new ArrayList<>();
+       return employeeService.readAll().stream()
+                .map(e ->e.getFirstName().substring(0, 1)+e.getLastName().substring(0, 1) )
+                .collect(Collectors.toList());
+//        return new ArrayList<>();
     }
 
     // Display the full names of all the employees
@@ -439,7 +450,7 @@ public class Practice {
     }
 
     // Display the length of the longest full name(s)
-    public static Integer getLongestNameLength() throws Exception {
+    public static Integer getLongestNameLength(){
         Optional<Integer> longestName=getAllEmployeesFullNames().stream()
                 .map(s->s.length())
                 .reduce(Integer::max);
@@ -449,8 +460,10 @@ public class Practice {
 
     // Display the employee(s) with the longest full name(s)
     public static List<Employee> getLongestNamedEmployee() {
-        //TODO Implement the method
-        return new ArrayList<>();
+       return employeeService.readAll().stream()
+               .filter(e-> (e.getFirstName()+" "+e.getLastName()).length()==getLongestNameLength())
+                .collect(Collectors.toList());
+//        return new ArrayList<>();
     }
 
     // Display all the employees whose department id is 90, 60, 100, 120, or 130
